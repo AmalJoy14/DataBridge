@@ -28,8 +28,9 @@
     color: var(--primary-600);
   }
   
-  .logoIcon {
-    font-size: 1.75rem;
+  .logoImage {
+    width: 2.5rem;
+    height: 2.5rem;
   }
   
   .logo h1 {

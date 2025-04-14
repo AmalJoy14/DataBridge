@@ -3,7 +3,7 @@
 import { useState } from "react"
 import styles from "./Header.module.css"
 import { FiSun, FiMoon, FiMenu, FiX } from "react-icons/fi"
-import { FaDatabase } from "react-icons/fa"
+import myImage from '../assets/databridge-logo.png';
 
 const Header = ({ darkMode, toggleDarkMode }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -16,7 +16,7 @@ const Header = ({ darkMode, toggleDarkMode }) => {
     <header className={`${styles.header} ${darkMode ? styles.darkMode : ""}`}>
       <div className={styles.container}>
         <div className={styles.logo}>
-          <FaDatabase className={styles.logoIcon} />
+          <img src={myImage} alt="DataBridge Logo" className={styles.logoImage} />
           <h1>DataBridge</h1>
         </div>
 
@@ -25,22 +25,6 @@ const Header = ({ darkMode, toggleDarkMode }) => {
         </div>
 
         <nav className={`${styles.nav} ${mobileMenuOpen ? styles.mobileMenuOpen : ""}`}>
-          <ul className={styles.navList}>
-            <li className={styles.navItem}>
-              <a href="#" className={styles.active}>
-                Dashboard
-              </a>
-            </li>
-            <li className={styles.navItem}>
-              <a href="#">History</a>
-            </li>
-            <li className={styles.navItem}>
-              <a href="#">Settings</a>
-            </li>
-            <li className={styles.navItem}>
-              <a href="#">Help</a>
-            </li>
-          </ul>
           <button
             className={styles.themeToggle}
             onClick={toggleDarkMode}

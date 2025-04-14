@@ -7,6 +7,8 @@ import Footer from "./components/Footer"
 import { ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import styles from "./App.module.css"
+import "./index.css"
+
 
 function App() {
   const [darkMode, setDarkMode] = useState(false)
