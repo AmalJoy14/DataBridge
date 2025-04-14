@@ -1,0 +1,28 @@
+.app {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #f8fafc;
+    color: #1e293b;
+    transition: all 0.3s ease;
+  }
+  
+  .darkMode {
+    background-color: #0f172a;
+    color: #e2e8f0;
+  }
+  
+  .main {
+    flex: 1;
+    padding: 2rem;
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+  }
+  
+  @media (max-width: 768px) {
+    .main {
+      padding: 1rem;
+    }
+  }
+  

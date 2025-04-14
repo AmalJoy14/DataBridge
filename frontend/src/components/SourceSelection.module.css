@@ -1,0 +1,156 @@
+.sourceSelection h3 {
+    margin-bottom: 1rem;
+    color: var(--gray-800);
+  }
+  
+  .darkMode .sourceSelection h3 {
+    color: var(--gray-100);
+  }
+  
+  .sourceSelection p {
+    margin-bottom: 1.5rem;
+    color: var(--gray-600);
+  }
+  
+  .darkMode .sourceSelection p {
+    color: var(--gray-400);
+  }
+  
+  .selectionContainer {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  .sourceContainer,
+  .targetContainer {
+    flex: 1;
+  }
+  
+  .sourceContainer h4,
+  .targetContainer h4 {
+    margin-bottom: 1rem;
+    color: var(--gray-700);
+    font-size: 1rem;
+  }
+  
+  .darkMode .sourceContainer h4,
+  .darkMode .targetContainer h4 {
+    color: var(--gray-300);
+  }
+  
+  .options {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1rem;
+  }
+  
+  .option {
+    background-color: var(--gray-100);
+    border-radius: 0.5rem;
+    padding: 1.25rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    border: 2px solid transparent;
+  }
+  
+  .darkMode .option {
+    background-color: var(--gray-700);
+  }
+  
+  .option:hover {
+    background-color: var(--gray-200);
+    transform: translateY(-2px);
+  }
+  
+  .darkMode .option:hover {
+    background-color: var(--gray-600);
+  }
+  
+  .option.selected {
+    border-color: var(--primary-500);
+    background-color: var(--primary-50);
+  }
+  
+  .darkMode .option.selected {
+    background-color: var(--gray-700);
+  }
+  
+  .iconContainer {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background-color: var(--primary-100);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-600);
+  }
+  
+  .darkMode .iconContainer {
+    background-color: var(--primary-900);
+    color: var(--primary-300);
+  }
+  
+  .icon {
+    font-size: 1.5rem;
+  }
+  
+  .optionLabel {
+    font-weight: 500;
+    color: var(--gray-800);
+  }
+  
+  .darkMode .optionLabel {
+    color: var(--gray-200);
+  }
+  
+  .arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-500);
+    font-size: 1.5rem;
+  }
+  
+  .formActions {
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .nextButton {
+    padding: 0.5rem 1.25rem;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: var(--primary-600);
+    color: white;
+    border: none;
+  }
+  
+  .nextButton:hover {
+    background-color: var(--primary-700);
+  }
+  
+  .nextButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  @media (max-width: 768px) {
+    .selectionContainer {
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+  
+    .arrow {
+      transform: rotate(90deg);
+    }
+  }
+  

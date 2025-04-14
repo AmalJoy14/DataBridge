@@ -1,0 +1,88 @@
+.statusDisplay {
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .statusItem {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.25rem;
+    border-radius: 0.5rem;
+    background-color: var(--gray-50);
+    border: 1px solid var(--gray-200);
+  }
+  
+  .darkMode .statusItem {
+    background-color: var(--gray-800);
+    border-color: var(--gray-700);
+  }
+  
+  .statusIcon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1.25rem;
+  }
+  
+  .connecting,
+  .fetching,
+  .ingesting {
+    background-color: var(--primary-100);
+    color: var(--primary-600);
+  }
+  
+  .darkMode .connecting,
+  .darkMode .fetching,
+  .darkMode .ingesting {
+    background-color: var(--primary-900);
+    color: var(--primary-300);
+  }
+  
+  .completed {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+  }
+  
+  .error {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--error);
+  }
+  
+  .spinnerIcon {
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  .statusText {
+    flex: 1;
+  }
+  
+  .statusTitle {
+    font-weight: 600;
+    color: var(--gray-800);
+    margin-bottom: 0.25rem;
+  }
+  
+  .darkMode .statusTitle {
+    color: var(--gray-100);
+  }
+  
+  .statusDescription {
+    color: var(--gray-600);
+    font-size: 0.95rem;
+  }
+  
+  .darkMode .statusDescription {
+    color: var(--gray-400);
+  }
+  
