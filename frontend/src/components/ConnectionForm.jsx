@@ -13,6 +13,7 @@ const ConnectionForm = ({
   error,
   darkMode,
 }) => {
+  
   const handleClickhouseChange = (e) => {
     const { name, value } = e.target
     onConnectionParamsChange("clickhouse", {
@@ -23,8 +24,8 @@ const ConnectionForm = ({
 
   const handleFlatFileChange = (e) => {
     const { name, value } = e.target
-    onConnectionParamsChange("flatFile", {
-      ...connectionParams.flatFile,
+    onConnectionParamsChange("flatfile", {
+      ...connectionParams.flatfile,
       [name]: value,
     })
   }
@@ -128,7 +129,7 @@ const ConnectionForm = ({
                     type="text"
                     id="source-file-name"
                     name="fileName"
-                    value={connectionParams.flatFile.fileName}
+                    value={connectionParams.flatfile?.fileName || ''}
                     onChange={handleFlatFileChange}
                     placeholder="data.csv"
                     required
@@ -140,7 +141,7 @@ const ConnectionForm = ({
                   <select
                     id="source-delimiter"
                     name="delimiter"
-                    value={connectionParams.flatFile.delimiter}
+                    value={connectionParams.flatfile?.delimiter || ','}
                     onChange={handleFlatFileChange}
                     required
                   >
@@ -241,7 +242,7 @@ const ConnectionForm = ({
                     type="text"
                     id="target-file-name"
                     name="fileName"
-                    value={connectionParams.flatFile.fileName}
+                    value={connectionParams.flatfile?.fileName || ''}
                     onChange={handleFlatFileChange}
                     placeholder="output.csv"
                     required
@@ -253,7 +254,7 @@ const ConnectionForm = ({
                   <select
                     id="target-delimiter"
                     name="delimiter"
-                    value={connectionParams.flatFile.delimiter}
+                    value={connectionParams.flatfile?.delimiter || ','}
                     onChange={handleFlatFileChange}
                     required
                   >

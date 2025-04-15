@@ -8,24 +8,18 @@ import ColumnSelection from "./ColumnSelection"
 import IngestionControls from "./IngestionControls"
 import StatusDisplay from "./StatusDisplay"
 import ResultsDisplay from "./ResultsDisplay"
+import axios from "axios"
 
 const Dashboard = ({ darkMode }) => {
   const [activeStep, setActiveStep] = useState(1)
   const [sourceType, setSourceType] = useState("")
   const [targetType, setTargetType] = useState("")
   const [connectionParams, setConnectionParams] = useState({
-    clickhouse: {
-      host: "",
-      port: "",
-      database: "",
-      user: "",
-      token: "",
-    },
-    flatFile: {
-      fileName: "",
-      delimiter: ",",
-    },
-  })
+    clickhouse: { host: '', port: '', database: '', user: '', jwtToken: '' },
+    flatfile: { fileName: '', delimiter: ',' }
+  });
+  
+
   const [availableTables, setAvailableTables] = useState([])
   const [selectedTable, setSelectedTable] = useState("")
   const [availableColumns, setAvailableColumns] = useState([])
@@ -53,8 +47,12 @@ const Dashboard = ({ darkMode }) => {
       setStatus("connecting")
       setError(null)
 
-      // Simulate API call to connect to source
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+    
+      const payload = connectionParams.clickhouse;
+      console.log(payload);
+      const res = await axios.post('http://localhost:3000/api/connect-clickhouse', payload);
+      console.log(res.data);
+      setStatus('connected');
 
       // Mock data for tables
       if (sourceType === "clickhouse") {

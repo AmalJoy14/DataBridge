@@ -1,25 +1,30 @@
-// clickhouseService.js
+
 import { createClient } from '@clickhouse/client';
 
-export function connectToClickHouse({ host, port, database, user, jwtToken }) {
+export function connectToClickHouse({ host, port, database, user, password }) {
+  console.log(host + " " + port + " " + database + " " + user + " " + password);
+
   const client = createClient({
-    host: `http://${host}:${port}`,
+    url: `http://${host}:${port}`,
     database,
     username: user,
-    headers: {
-      Authorization: `Bearer ${jwtToken}`,
-    },
+    password: password,
   });
 
   return client;
 }
 
 export async function testConnection(client) {
-  const resultSet = await client.query({
-    query: 'SELECT now(), version()',
-    format: 'JSON',
-  });
+  try {
+    const resultSet = await client.query({
+      query: 'SELECT now(), version()',
+      format: 'JSON',
+    });
 
-  const rows = await resultSet.json();
-  return rows;
+    const rows = await resultSet.json();
+    console.log(rows); 
+    return rows;
+  } catch (error) {
+    console.error('Connection Error:', error);
+  }
 }
