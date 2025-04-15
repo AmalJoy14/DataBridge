@@ -29,6 +29,10 @@ const Dashboard = ({ darkMode }) => {
   const [error, setError] = useState(null)
   const [previewData, setPreviewData] = useState(null)
 
+  const handleResetPreviewData = () => {
+    setPreviewData(null)
+  }
+
   const handleSourceChange = (source, target) => {
     setSourceType(source)
     setTargetType(target)
@@ -74,45 +78,26 @@ const Dashboard = ({ darkMode }) => {
   const handleTableSelect = async (table) => {
     try {
       setSelectedTable(table)
+      setAvailableColumns([]);
+      setSelectedColumns([]); // Reset selected columns
+      setPreviewData(null); // Reset preview data
       setStatus("fetching")
       setError(null)
 
-      // Simulate API call to fetch columns
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      // Mock data for columns
-      if (table === "uk_price_paid") {
-        setAvailableColumns([
-          { id: 1, name: "transaction_id", type: "String" },
-          { id: 2, name: "price", type: "UInt32" },
-          { id: 3, name: "date_of_transfer", type: "Date" },
-          { id: 4, name: "postcode", type: "String" },
-          { id: 5, name: "property_type", type: "String" },
-          { id: 6, name: "old_new", type: "String" },
-          { id: 7, name: "duration", type: "String" },
-          { id: 8, name: "town_city", type: "String" },
-          { id: 9, name: "district", type: "String" },
-          { id: 10, name: "county", type: "String" },
-        ])
-      } else if (table === "ontime") {
-        setAvailableColumns([
-          { id: 1, name: "Year", type: "UInt16" },
-          { id: 2, name: "Quarter", type: "UInt8" },
-          { id: 3, name: "Month", type: "UInt8" },
-          { id: 4, name: "DayofMonth", type: "UInt8" },
-          { id: 5, name: "DayOfWeek", type: "UInt8" },
-          { id: 6, name: "FlightDate", type: "Date" },
-          { id: 7, name: "UniqueCarrier", type: "String" },
-          { id: 8, name: "AirlineID", type: "UInt32" },
-          { id: 9, name: "Carrier", type: "String" },
-          { id: 10, name: "TailNum", type: "String" },
-        ])
+      const payload = connectionParams.clickhouse;
+      const res = await axios.post('http://localhost:3000/api/clickhouse/columns', {payload , selectedTable : table});
+      console.log(res.data);
+      
+      if (res.data.success) {
+        // Add an `id` field (unique key) for each column
+        const columnsWithIds = res.data.columns.map((column, index) => ({
+          ...column,
+          id: index, 
+        }));
+        
+        setAvailableColumns(columnsWithIds);
       } else {
-        setAvailableColumns([
-          { id: 1, name: "column1", type: "String" },
-          { id: 2, name: "column2", type: "UInt32" },
-          { id: 3, name: "column3", type: "Date" },
-        ])
+        throw new Error(res.data.message);
       }
 
       setStatus("idle")
@@ -137,28 +122,19 @@ const Dashboard = ({ darkMode }) => {
       setStatus("fetching")
       setError(null)
 
-      // Simulate API call to fetch preview data
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-
-      // Mock preview data
-      const mockData = []
-      for (let i = 0; i < 5; i++) {
-        const row = {}
-        selectedColumns.forEach((col) => {
-          if (col.type === "UInt32" || col.type === "UInt16" || col.type === "UInt8") {
-            row[col.name] = Math.floor(Math.random() * 1000)
-          } else if (col.type === "Date") {
-            row[col.name] = new Date(2023, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1)
-              .toISOString()
-              .split("T")[0]
-          } else {
-            row[col.name] = `Sample ${col.name} ${i + 1}`
-          }
-        })
-        mockData.push(row)
+      const payload = {
+        connectionParams: connectionParams.clickhouse,
+        selectedTable,
+        selectedColumns: selectedColumns.map(col => col.name),
       }
 
-      setPreviewData(mockData)
+      const res = await axios.post('http://localhost:3000/api/clickhouse/preview', payload)
+      console.log(res.data);
+      if (res.data.success) {
+        setPreviewData(res.data)
+      } else {
+        throw new Error( "Failed to fetch preview")
+      }
       setStatus("idle")
     } catch (err) {
       setStatus("error")
@@ -312,6 +288,7 @@ const Dashboard = ({ darkMode }) => {
             status={status}
             error={error}
             darkMode={darkMode}
+            onResetPreviewData={handleResetPreviewData}
           />
         )}
 

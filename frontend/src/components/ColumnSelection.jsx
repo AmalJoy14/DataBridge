@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import styles from "./ColumnSelection.module.css"
 
 const ColumnSelection = ({
@@ -14,27 +14,63 @@ const ColumnSelection = ({
   status,
   error,
   darkMode,
+  onResetPreviewData, // new prop
 }) => {
   const [selectAll, setSelectAll] = useState(false)
+  const [tempSelectedColumns, setTempSelectedColumns] = useState([])
+
+  // Reset previewData when availableColumns change
+  useEffect(() => {
+    setTempSelectedColumns([])
+    setSelectAll(false)
+  }, [availableColumns])
+
+  // Sync with parent when preview is triggered
+  const handlePreview = () => {
+    onColumnSelect(tempSelectedColumns) // this will update parent state
+  }
+
+  useEffect(() => {
+    if (selectedColumns.length > 0) {
+      onPreview(selectedColumns)
+    }
+  }, [selectedColumns])
+
+  useEffect(() => {
+    setTempSelectedColumns(selectedColumns)
+    setSelectAll(selectedColumns.length === availableColumns.length)
+  }, [selectedColumns, availableColumns])
+
+  // Reset previewData on column selection change
+  useEffect(() => {
+    if (onResetPreviewData) {
+      onResetPreviewData()
+    }
+  }, [tempSelectedColumns])
 
   const handleSelectAll = () => {
-    if (selectAll) {
-      onColumnSelect([])
+    const newSelectAll = !selectAll
+    setSelectAll(newSelectAll)
+    if (newSelectAll) {
+      setTempSelectedColumns([...availableColumns])
     } else {
-      onColumnSelect([...availableColumns])
+      setTempSelectedColumns([])
     }
-    setSelectAll(!selectAll)
   }
 
   const handleColumnToggle = (column) => {
-    const isSelected = selectedColumns.some((col) => col.id === column.id)
-
+    const isSelected = tempSelectedColumns.some((col) => col.id === column.id)
     if (isSelected) {
-      onColumnSelect(selectedColumns.filter((col) => col.id !== column.id))
+      setTempSelectedColumns(tempSelectedColumns.filter((col) => col.id !== column.id))
     } else {
-      onColumnSelect([...selectedColumns, column])
+      setTempSelectedColumns([...tempSelectedColumns, column])
     }
   }
+
+  // const handlePreview = () => {
+  //   onColumnSelect(tempSelectedColumns)
+  //   onPreview()
+  // }
 
   return (
     <div className={`${styles.columnSelection} ${darkMode ? styles.darkMode : ""}`}>
@@ -51,7 +87,7 @@ const ColumnSelection = ({
         </div>
 
         <div className={styles.columnCount}>
-          {selectedColumns.length} of {availableColumns.length} columns selected
+          {tempSelectedColumns.length} of {availableColumns.length} columns selected
         </div>
       </div>
 
@@ -59,12 +95,12 @@ const ColumnSelection = ({
         {availableColumns.map((column) => (
           <div
             key={column.id}
-            className={`${styles.columnItem} ${selectedColumns.some((col) => col.id === column.id) ? styles.selected : ""}`}
+            className={`${styles.columnItem} ${tempSelectedColumns.some((col) => col.id === column.id) ? styles.selected : ""}`}
           >
             <label className={styles.checkboxContainer}>
               <input
                 type="checkbox"
-                checked={selectedColumns.some((col) => col.id === column.id)}
+                checked={tempSelectedColumns.some((col) => col.id === column.id)}
                 onChange={() => handleColumnToggle(column)}
               />
               <span className={styles.checkmark}></span>
@@ -78,30 +114,32 @@ const ColumnSelection = ({
       </div>
 
       {previewData && (
-        <div className={styles.previewContainer}>
-          <h4>Data Preview</h4>
-          <div className={styles.tableWrapper}>
-            <table className={styles.previewTable}>
-              <thead>
-                <tr>
-                  {selectedColumns.map((column) => (
-                    <th key={column.id}>{column.name}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {previewData.map((row, index) => (
-                  <tr key={index}>
-                    {selectedColumns.map((column) => (
-                      <td key={column.id}>{row[column.name]}</td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
+  <div className={styles.previewContainer}>
+    <h4>Data Preview</h4>
+    <p>Preview of the first 100 rows of data:</p>
+    <div className={styles.tableWrapper}>
+      <table className={styles.previewTable}>
+        <thead>
+          <tr>
+            {tempSelectedColumns.map((column) => (
+              <th key={column.id}>{column.name}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {previewData.data.map((row, index) => (
+            <tr key={index}>
+              {tempSelectedColumns.map((column) => (
+                <td key={column.id}>{row[column.name]}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+)}
+
 
       {error && <div className={styles.error}>{error}</div>}
 
@@ -113,8 +151,8 @@ const ColumnSelection = ({
         <div>
           <button
             className={styles.previewButton}
-            onClick={onPreview}
-            disabled={status === "fetching" || selectedColumns.length === 0}
+            onClick={handlePreview}
+            disabled={status === "fetching" || tempSelectedColumns.length === 0}
           >
             {status === "fetching" ? "Loading..." : "Preview Data"}
           </button>
