@@ -5,10 +5,12 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 dotenv.config();
 import { connectToClickHouse, testConnection } from './services/clickhouseService.js';
+import clickhouseRoutes from './Routes/clickhouse.js';
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
+app.use('/api/clickhouse', clickhouseRoutes);
 
 app.get('/', (req, res) => {
   console.log("Root route hit");
@@ -33,6 +35,24 @@ app.post('/api/connect-clickhouse', async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 });
+
+
+app.get('/tables', async (req, res) => {
+  try {
+    const resultSet = await clickhouseClient.query({
+      query: `SELECT name FROM system.tables WHERE database = 'default'`,
+      format: 'JSON',
+    });
+
+    const rows = await resultSet.json();
+    const tableNames = rows.data.map(row => row.name);
+    res.json({ success: true, tables: tableNames });
+  } catch (error) {
+    console.error('Error fetching tables:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch tables' });
+  }
+});
+
 
 const PORT = 3000;
 app.listen(PORT, () => {

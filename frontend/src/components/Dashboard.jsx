@@ -24,7 +24,7 @@ const Dashboard = ({ darkMode }) => {
   const [selectedTable, setSelectedTable] = useState("")
   const [availableColumns, setAvailableColumns] = useState([])
   const [selectedColumns, setSelectedColumns] = useState([])
-  const [status, setStatus] = useState("idle") // idle, connecting, fetching, ingesting, completed, error
+  const [status, setStatus] = useState("idle") 
   const [results, setResults] = useState(null)
   const [error, setError] = useState(null)
   const [previewData, setPreviewData] = useState(null)
@@ -54,9 +54,13 @@ const Dashboard = ({ darkMode }) => {
       console.log(res.data);
       setStatus('connected');
 
-      // Mock data for tables
       if (sourceType === "clickhouse") {
-        setAvailableTables(["uk_price_paid", "ontime", "hits", "visits"])
+        const res = await axios.post('http://localhost:3000/api/clickhouse/tables', payload);
+        if (res.data.success) {
+          setAvailableTables(res.data.tables);
+        } else {
+          throw new Error('Failed to fetch tables');
+        }
       }
 
       setStatus("idle")

@@ -1,16 +1,17 @@
 
 import { createClient } from '@clickhouse/client';
+let client = null; 
 
 export function connectToClickHouse({ host, port, database, user, password }) {
   console.log(host + " " + port + " " + database + " " + user + " " + password);
-
-  const client = createClient({
-    url: `http://${host}:${port}`,
-    database,
-    username: user,
-    password: password,
-  });
-
+  if (!client) {
+    client = createClient({
+      url: `http://${host}:${port}`,
+      database,
+      username: user,
+      password: password,
+    });
+  }
   return client;
 }
 
