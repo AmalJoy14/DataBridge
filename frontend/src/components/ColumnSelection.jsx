@@ -114,31 +114,31 @@ const ColumnSelection = ({
       </div>
 
       {previewData && (
-  <div className={styles.previewContainer}>
-    <h4>Data Preview</h4>
-    <p>Preview of the first 100 rows of data:</p>
-    <div className={styles.tableWrapper}>
-      <table className={styles.previewTable}>
-        <thead>
-          <tr>
-            {tempSelectedColumns.map((column) => (
-              <th key={column.id}>{column.name}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {previewData.data.map((row, index) => (
-            <tr key={index}>
-              {tempSelectedColumns.map((column) => (
-                <td key={column.id}>{row[column.name]}</td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  </div>
-)}
+        <div className={styles.previewContainer}>
+          <h4>Data Preview</h4>
+          <p>Preview of the first 100 rows of data:</p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.previewTable}>
+              <thead>
+                <tr>
+                  {tempSelectedColumns.map((column) => (
+                    <th key={column.id}>{column.name}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {previewData.data.map((row, index) => (
+                  <tr key={index}>
+                    {tempSelectedColumns.map((column) => (
+                      <td key={column.id}>{row[column.name]}</td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
 
       {error && <div className={styles.error}>{error}</div>}

@@ -16,7 +16,7 @@ const Dashboard = ({ darkMode }) => {
   const [targetType, setTargetType] = useState("")
   const [connectionParams, setConnectionParams] = useState({
     clickhouse: { host: '', port: '', database: '', user: '', jwtToken: '' },
-    flatfile: { fileName: '', delimiter: ',' }
+    flatfile: { fileName: '', delimiter: ',' ,  fileObject: null }
   });
   
 
@@ -51,8 +51,9 @@ const Dashboard = ({ darkMode }) => {
       setStatus("connecting")
       setError(null)
 
-    
-      const payload = connectionParams.clickhouse;
+      
+
+      let payload = connectionParams.clickhouse;
       console.log(payload);
       const res = await axios.post('http://localhost:3000/api/connect-clickhouse', payload);
       console.log(res.data);
@@ -65,10 +66,26 @@ const Dashboard = ({ darkMode }) => {
         } else {
           throw new Error('Failed to fetch tables');
         }
+        setStatus("idle")
+        setActiveStep(3)
+      }
+      else if (sourceType === "flatfile") {
+        await uploadFlatFile();
+        setAvailableTables([]); 
+        payload = connectionParams.flatfile;
+        console.log(payload);
+        const res = await axios.post('http://localhost:3000/api/flatfile/columns', payload);
+        console.log(res);
+        if (res.data.success) {
+          setAvailableColumns(res.data.columns);
+        } else {
+          throw new Error('Failed to fetch columns');
+        }
+        setStatus("idle")
+        setActiveStep(4)
       }
 
-      setStatus("idle")
-      setActiveStep(3)
+      
     } catch (err) {
       setStatus("error")
       setError("Failed to connect to the source. Please check your connection parameters.")
@@ -121,14 +138,27 @@ const Dashboard = ({ darkMode }) => {
 
       setStatus("fetching")
       setError(null)
+      let res = null;
 
-      const payload = {
-        connectionParams: connectionParams.clickhouse,
-        selectedTable,
-        selectedColumns: selectedColumns.map(col => col.name),
+      if (sourceType === "flatfile") {
+        const payload = {
+          connectionParams: connectionParams.flatfile,
+          selectedColumns: selectedColumns.map(col => col.name),
+        }
+  
+        res = await axios.post('http://localhost:3000/api/flatfile/preview', payload)
+      }
+      else{
+        const payload = {
+          connectionParams: connectionParams.clickhouse,
+          selectedTable,
+          selectedColumns: selectedColumns.map(col => col.name),
+        }
+  
+        res = await axios.post('http://localhost:3000/api/clickhouse/preview', payload)
       }
 
-      const res = await axios.post('http://localhost:3000/api/clickhouse/preview', payload)
+      
       console.log(res.data);
       if (res.data.success) {
         setPreviewData(res.data)
@@ -158,8 +188,14 @@ const Dashboard = ({ darkMode }) => {
         selectedTable,
         selectedColumns: selectedColumns.map(col => col.name),
       }
-  
-      const response = await axios.post("http://localhost:3000/api/clickhouse/start-ingestion", payload); 
+      let response = null;
+      if (sourceType === "flatfile") {
+        response = await axios.post("http://localhost:3000/api/flatfile/start-ingestion", payload);
+      }
+      else{
+        response = await axios.post("http://localhost:3000/api/clickhouse/start-ingestion", payload);
+      }
+       
   
       if (response.data.success) {
         // If ingestion was successful, update results
@@ -183,6 +219,30 @@ const Dashboard = ({ darkMode }) => {
       console.error(err);
     }
   };
+
+  const uploadFlatFile = async () => {
+    const formData = new FormData()
+  
+    // assuming these are set
+    const file = connectionParams.flatfile.fileObject
+    const delimiter = connectionParams.flatfile.delimiter
+  
+    formData.append("file", file)
+    formData.append("delimiter", delimiter)
+  
+    try {
+      const response = await axios.post("http://localhost:3000/api/flatfile/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      })
+      connectionParams.flatfile.fileName = response.data.file;
+      console.log("Upload success", response.data)
+    } catch (error) {
+      console.error("Upload failed", error)
+    }
+  }
+
 
   const resetFlow = () => {
     setActiveStep(1)
@@ -291,7 +351,7 @@ const Dashboard = ({ darkMode }) => {
             availableColumns={availableColumns}
             selectedColumns={selectedColumns}
             onColumnSelect={handleColumnSelect}
-            onBack={() => setActiveStep(3)}
+            onBack={() => setActiveStep(sourceType === "flatfile" ? 2 : 3)}
             onNext={() => setActiveStep(5)}
             onPreview={handlePreview}
             previewData={previewData}
@@ -317,7 +377,7 @@ const Dashboard = ({ darkMode }) => {
 
             <StatusDisplay status={status} error={error} darkMode={darkMode} />
 
-            {results && <ResultsDisplay results={results} onReset={resetFlow} darkMode={darkMode} />}
+            {results && <ResultsDisplay results={results} onReset={resetFlow} darkMode={darkMode} sourceType={sourceType}/>}
           </div>
         )}
       </div>

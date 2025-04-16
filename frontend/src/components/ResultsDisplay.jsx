@@ -3,7 +3,7 @@
 import styles from "./ResultsDisplay.module.css"
 import { FiCheckCircle, FiClock, FiDatabase, FiFile, FiColumns } from "react-icons/fi"
 
-const ResultsDisplay = ({ results, onReset, darkMode }) => {
+const ResultsDisplay = ({ results, onReset, darkMode , sourceType}) => {
   const formatDate = (dateString) => {
     const date = new Date(dateString)
     return date.toLocaleString()
@@ -69,7 +69,7 @@ const ResultsDisplay = ({ results, onReset, darkMode }) => {
           Start New Ingestion
         </button>
 
-        <button
+        {sourceType === "clickhouse" && <button
           className={styles.downloadButton}
           onClick={() => {
             const fileName = results.csvFile || "output.csv";
@@ -83,7 +83,7 @@ const ResultsDisplay = ({ results, onReset, darkMode }) => {
           }}
         >
           Download Report
-        </button>
+        </button>}
       </div>
     </div>
   )

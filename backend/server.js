@@ -6,11 +6,13 @@ import dotenv from 'dotenv';
 dotenv.config();
 import { connectToClickHouse, testConnection } from './services/clickhouseService.js';
 import clickhouseRoutes from './Routes/clickhouse.js';
+import flatfileRoutes from './Routes/flatfile.js';
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 app.use('/api/clickhouse', clickhouseRoutes);
+app.use('/api/flatfile', flatfileRoutes);
 
 app.get('/', (req, res) => {
   console.log("Root route hit");

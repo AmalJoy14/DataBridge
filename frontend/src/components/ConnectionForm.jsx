@@ -77,7 +77,7 @@ const ConnectionForm = ({
                     name="port"
                     value={connectionParams.clickhouse.port}
                     onChange={handleClickhouseChange}
-                    placeholder="9440 or 8443 for https"
+                    placeholder="9440 or 8123 for https"
                     required
                   />
                 </div>
@@ -124,16 +124,23 @@ const ConnectionForm = ({
             ) : (
               <div className={styles.formFields}>
                 <div className={styles.formGroup}>
-                  <label htmlFor="source-file-name">File Name</label>
-                  <input
-                    type="text"
-                    id="source-file-name"
-                    name="fileName"
-                    value={connectionParams.flatfile?.fileName || ''}
-                    onChange={handleFlatFileChange}
-                    placeholder="data.csv"
-                    required
-                  />
+                <label htmlFor="source-file-upload">Upload File</label>
+                <input
+                  type="file"
+                  id="source-file-upload"
+                  accept=".csv,.tsv,.txt"
+                  onChange={(e) => {
+                    const file = e.target.files[0]
+                    if (file) {
+                      onConnectionParamsChange("flatfile", {
+                        ...connectionParams.flatfile,
+                        fileName: file.name,
+                        fileObject: file, // optional: store the full file
+                      })
+                    }
+                  }}
+                  required
+                />
                 </div>
 
                 <div className={styles.formGroup}>
@@ -189,7 +196,7 @@ const ConnectionForm = ({
                     name="port"
                     value={connectionParams.clickhouse.port}
                     onChange={handleClickhouseChange}
-                    placeholder="9440 or 8443 for https"
+                    placeholder="9440 or 8123 for https"
                     required
                   />
                 </div>
@@ -260,7 +267,6 @@ const ConnectionForm = ({
                     <option value=",">Comma (,)</option>
                     <option value=";">Semicolon (;)</option>
                     <option value="\t">Tab</option>
-                    <option value="|">Pipe (|)</option>
                   </select>
                 </div>
               </div>
