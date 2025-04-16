@@ -148,7 +148,6 @@ const ConnectionForm = ({
                     <option value=",">Comma (,)</option>
                     <option value=";">Semicolon (;)</option>
                     <option value="\t">Tab</option>
-                    <option value="|">Pipe (|)</option>
                   </select>
                 </div>
               </div>

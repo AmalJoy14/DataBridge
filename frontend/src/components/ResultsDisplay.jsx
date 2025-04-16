@@ -69,7 +69,21 @@ const ResultsDisplay = ({ results, onReset, darkMode }) => {
           Start New Ingestion
         </button>
 
-        <button className={styles.downloadButton}>Download Report</button>
+        <button
+          className={styles.downloadButton}
+          onClick={() => {
+            const fileName = results.csvFile || "output.csv";
+            const downloadUrl = `http://localhost:3000/api/clickhouse/download/${fileName}`;
+            const link = document.createElement("a");
+            link.href = downloadUrl;
+            link.setAttribute("download", fileName);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+          }}
+        >
+          Download Report
+        </button>
       </div>
     </div>
   )

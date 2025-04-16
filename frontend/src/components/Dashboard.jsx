@@ -145,34 +145,44 @@ const Dashboard = ({ darkMode }) => {
   const handleStartIngestion = async () => {
     try {
       if (selectedColumns.length === 0) {
-        setError("Please select at least one column to ingest.")
-        return
+        setError("Please select at least one column to ingest.");
+        return;
       }
-
-      setStatus("ingesting")
-      setError(null)
-      setResults(null)
-
-      // Simulate ingestion process
-      await new Promise((resolve) => setTimeout(resolve, 3000))
-
-      // Mock results
-      setResults({
-        recordsProcessed: Math.floor(Math.random() * 10000) + 5000,
-        startTime: new Date(Date.now() - 3000).toISOString(),
-        endTime: new Date().toISOString(),
-        source: sourceType,
-        target: targetType,
-        table: selectedTable,
-        columnsCount: selectedColumns.length,
-      })
-
-      setStatus("completed")
+  
+      setStatus("ingesting");
+      setError(null);
+      setResults(null);
+  
+      const payload = {
+        connectionParams: connectionParams,
+        selectedTable,
+        selectedColumns: selectedColumns.map(col => col.name),
+      }
+  
+      const response = await axios.post("http://localhost:3000/api/clickhouse/start-ingestion", payload); 
+  
+      if (response.data.success) {
+        // If ingestion was successful, update results
+        setResults({
+          recordsProcessed: response.data.recordsProcessed,
+          startTime: response.data.startTime,
+          endTime: response.data.endTime,
+          source: sourceType,
+          target: targetType,
+          table: selectedTable,
+          columnsCount: selectedColumns.length,
+        });
+        
+        setStatus("completed");
+      } else {
+        throw new Error("Ingestion failed");
+      }
     } catch (err) {
-      setStatus("error")
-      setError("An error occurred during ingestion. Please try again.")
+      setStatus("error");
+      setError("An error occurred during ingestion. Please try again.");
+      console.error(err);
     }
-  }
+  };
 
   const resetFlow = () => {
     setActiveStep(1)
