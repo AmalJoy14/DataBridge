@@ -86,24 +86,20 @@ router.post('/columns', (req, res) => {
     sampleRows.forEach(row => {
       const value = row[columnName];
   
-      if (value === undefined || value === null) return; // Skip undefined/null values
+      if (value === undefined || value === null) return; 
   
-      // Check if value is a string
       if (typeof value === 'string') {
         isString = true;
       }
   
-      // Check if value can be converted to an integer
       if (isInteger && !/^\d+$/.test(value)) {
         isInteger = false;
       }
   
-      // Check if value can be converted to a float
       if (isFloat && isNaN(parseFloat(value))) {
         isFloat = false;
       }
   
-      // Check if value is a valid date
       if (isDateTime && isNaN(Date.parse(value))) {
         isDateTime = false;
       }
@@ -135,7 +131,6 @@ router.post('/columns', (req, res) => {
     return res.status(404).json({ success: false, message: 'File not found' });
     }
 
-    const indexedColumns = [];
     const data = []; 
     const MAX_SAMPLE_SIZE = 100; 
   
@@ -190,13 +185,21 @@ router.post('/columns', (req, res) => {
       .on('data', (row) => {
         const filtered = {};
         selectedColumns.forEach(col => {
-        filtered[col] = row[col];
+          filtered[col] = row[col];
         });
         rows.push(filtered); 
+        console.log("rows done: ", rows.length);
       })
       .on('end', async () => {
-  
+        console.log("tableName: ", tableName);
         try {
+          const createTableQuery = `
+              CREATE TABLE IF NOT EXISTS ${database}.${tableName} (
+                ${selectedColumns.map(col => `\`${col}\` String`).join(',\n')}
+              ) ENGINE = MergeTree()
+              ORDER BY \`${selectedColumns[0]}\`;
+            `;
+            await client.command({ query: createTableQuery });
             await client.insert({
                 table: tableName,
                 values: rows, 

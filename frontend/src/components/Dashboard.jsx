@@ -182,7 +182,8 @@ const Dashboard = ({ darkMode }) => {
       setStatus("ingesting");
       setError(null);
       setResults(null);
-  
+      console.log("selectedColumns :" , selectedColumns);
+      console.log("availableColumns :" , availableColumns);
       const payload = {
         connectionParams: connectionParams,
         selectedTable,
